@@ -22,7 +22,9 @@ export const MyLocationButton = () => {
                 position: 'fixed',
                 bottom: '20px',
                 right: '20px',
-                zIndex: 999
+                zIndex: 999,
+                backgroundColor: '#61dafb',
+                color: '#000000'
             }}
         >
             Mi Ubicación
