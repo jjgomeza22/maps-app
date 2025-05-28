@@ -1,6 +1,6 @@
 import { useReducer, type JSX } from "react";
 
-import type { Map } from "@maptiler/sdk";
+import { Marker, Popup, type Map } from "@maptiler/sdk";
 
 import { MapContext } from "./MapContext";
 import { mapReducer } from "./MapReducer";
@@ -24,6 +24,18 @@ export const MapProvider = ({ children }: Props) => {
     const [state, dispatch] = useReducer(mapReducer, INITIAL_STATE);
 
     const setMap = (map: Map) => {
+        const popUp = new Popup()
+            .setHTML(`
+                <h4>Aquí estoy</h4>
+                <p>En algún ligar de mundo</p>
+            `)
+        new Marker({
+            color: '#61dafb'
+        })
+            .setLngLat(map.getCenter())
+            .setPopup(popUp)
+            .addTo(map);
+
         dispatch({ type: "setMap", payload: map })
     }
 
