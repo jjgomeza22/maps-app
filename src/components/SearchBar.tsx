@@ -1,5 +1,6 @@
 import { useContext, useRef, type ChangeEvent } from "react";
 import { PlacesContext } from "../context";
+import { SearchResult } from "./SearchResult";
 
 export const SearchBar = () => {
 
@@ -23,6 +24,12 @@ export const SearchBar = () => {
                 placeholder="Buscar lugar..."
                 onChange={ onQueryChanged }
             />
+            <div style={{
+                display: 'flex',
+                flexDirection: 'column'
+            }}>
+                <SearchResult />
+            </div>
         </div>
     );
 };
