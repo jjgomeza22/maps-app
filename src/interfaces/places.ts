@@ -10,7 +10,7 @@ export interface Feature {
     properties:           Properties;
     geometry:             Geometry;
     bbox:                 number[];
-    center:               number[];
+    center:               [number, number];
     place_name:           string;
     place_type:           string[];
     relevance:            number;
