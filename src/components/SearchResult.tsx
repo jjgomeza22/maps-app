@@ -4,8 +4,8 @@ import { LoadingPlaces } from "./LoadingPlaces";
 import type { Feature } from "../interfaces/places";
 
 export const SearchResult = () => {
-    const { places, isLoadingPlaces } = useContext(PlacesContext);
-    const { map } = useContext(MapContext);
+    const { places, isLoadingPlaces, userLocation } = useContext(PlacesContext);
+    const { map, getRouteBetweenPoints } = useContext(MapContext);
 
     const [activeId, setActiveId] = useState('');
 
@@ -21,6 +21,13 @@ export const SearchResult = () => {
         return (<LoadingPlaces />);
     }
 
+    const getRoute = (place: Feature) => {
+        if (!userLocation) return;
+        const start = userLocation;
+        const end = place.center;
+        getRouteBetweenPoints(start, end);
+    }
+
     return (
         <ul className={`list-group mb-0 ${places.length === 0 ? '' : 'mt-3'}`}>
             { places.map((place) => (
@@ -31,7 +38,7 @@ export const SearchResult = () => {
                 >
                     <h6> { place.text_es } </h6>
                     <p style={{ fontSize: '12px' }}> { place.place_name } </p>
-                    <button className={`btn btn-sm ${activeId === place.id ? 'btn-outline-light' : 'btn-outline-primary'}`}>Direcciones</button>
+                    <button onClick={ () => getRoute(place)}  className={`btn btn-sm ${activeId === place.id ? 'btn-outline-light' : 'btn-outline-primary'}`}>Direcciones</button>
                 </li>
             )) }
         </ul>

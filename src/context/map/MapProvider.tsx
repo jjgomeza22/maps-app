@@ -1,10 +1,12 @@
 import { useContext, useEffect, useReducer, type JSX } from "react";
 
-import { Marker, Popup, type Map } from "@maptiler/sdk";
+import { coordinates, data, LngLatBounds, Marker, Popup, type Map, type SourceSpecification } from "@maptiler/sdk";
 
 import { MapContext } from "./MapContext";
 import { mapReducer } from "./MapReducer";
 import { PlacesContext } from "../places/PlacesContext";
+import { directionsApi } from "../../apis";
+import type { DirectionsResponse } from "../../interfaces/directions";
 
 interface Props {
     children: JSX.Element | JSX.Element[]
@@ -66,6 +68,66 @@ export const MapProvider = ({ children }: Props) => {
         dispatch({ type: "setMap", payload: map })
     };
 
+    const getRouteBetweenPoints = async (start: [ number, number ], end: [ number, number ]): Promise<void> => {
+        const response = await directionsApi.get<DirectionsResponse>(`/${start.join(',')};${end.join(',')}`);
+        const { distance, duration, geometry } = response.data.routes[0];
+        const { coordinates: coords } = geometry;
+
+        let kms = distance / 1000;
+            kms = Math.round(kms * 100);
+            kms /= 100;
+
+        const minutes = Math.floor( duration / 60 );
+        const bounds = new LngLatBounds(
+            start,
+            start
+        );
+
+        coords.forEach((coord) => bounds.extend(coord));
+
+        state.map?.fitBounds(bounds, {
+            padding: 200
+        });
+
+        //Polyline
+        const sourceData: SourceSpecification = {
+            type: 'geojson',
+            data: {
+                type: 'FeatureCollection',
+                features: [
+                    {
+                        type: 'Feature',
+                        properties: {},
+                        geometry: {
+                            type: 'LineString',
+                            coordinates: coords
+                        }
+                    }
+                ]
+            }
+        }
+
+        if (state.map?.getLayer('RouteString')) {
+            state.map.removeLayer('RouteString');
+            state.map.removeSource('RouteString');
+        }
+
+        state.map?.addSource('RouteString', sourceData);
+        state.map?.addLayer({
+            id: 'RouteString',
+            type:'line',
+            source: 'RouteString',
+            layout: {
+                'line-cap': 'round',
+                'line-join': 'round'
+            },
+            paint: {
+                'line-color': 'black',
+                "line-width": 3
+            }
+        })
+    }
+
     return (
         <MapContext.Provider
             value={{
@@ -73,6 +135,7 @@ export const MapProvider = ({ children }: Props) => {
 
                 //methods
                 setMap,
+                getRouteBetweenPoints
             }}
         >
             { children }
