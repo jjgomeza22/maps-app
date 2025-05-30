@@ -1,6 +1,6 @@
 import { useContext, useEffect, useReducer, type JSX } from "react";
 
-import { coordinates, data, LngLatBounds, Marker, Popup, type Map, type SourceSpecification } from "@maptiler/sdk";
+import { LngLatBounds, Marker, Popup, type Map, type SourceSpecification } from "@maptiler/sdk";
 
 import { MapContext } from "./MapContext";
 import { mapReducer } from "./MapReducer";
@@ -70,14 +70,14 @@ export const MapProvider = ({ children }: Props) => {
 
     const getRouteBetweenPoints = async (start: [ number, number ], end: [ number, number ]): Promise<void> => {
         const response = await directionsApi.get<DirectionsResponse>(`/${start.join(',')};${end.join(',')}`);
-        const { distance, duration, geometry } = response.data.routes[0];
+        const { distance, geometry } = response.data.routes[0];
         const { coordinates: coords } = geometry;
 
         let kms = distance / 1000;
             kms = Math.round(kms * 100);
             kms /= 100;
 
-        const minutes = Math.floor( duration / 60 );
+        // const minutes = Math.floor( duration / 60 );
         const bounds = new LngLatBounds(
             start,
             start
